@@ -1,5 +1,6 @@
 def getNext(vidPath, videoPattern, subPath, subPattern, count):
-    import os, settingUtil
+    import os
+    from bin import settingUtil
 
     #no more files available
     if len(os.listdir(vidPath)) < count or len(os.listdir(subPath)) < count:
