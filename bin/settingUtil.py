@@ -12,14 +12,17 @@ def existSettingAndCountFile():
 
     return False
 
-#returns 2 strings, the first and the second part of the name (without the episode number)
+
+# returns 2 strings, the first and the second part of the name (without the episode number)
 def getPattern(filename):
     for i in range(len(filename)-1, 0, -1):
         match = filename[i-1]+filename[i]
         if match == "01":
-           return (filename[:i-1], filename[i+1:])
+           return filename[:i-1], filename[i+1:]
+
 
 SEPARATING_PATTERN = "____"
+
 
 def createSettingAndCountFile(pathVideos, pathSubs):
     with open("count.txt", "w") as f:
@@ -29,7 +32,7 @@ def createSettingAndCountFile(pathVideos, pathSubs):
         f.write(pathVideos+'\n') # videos folder
         f.write(pathSubs+'\n') # subs folder
 
-        #calculating pattern for videos
+        # calculating pattern for videos
         import os
         videos = os.listdir(pathVideos)
         videos.sort()
@@ -37,13 +40,14 @@ def createSettingAndCountFile(pathVideos, pathSubs):
         (firstPartVideo, secondPartVideo) = getPattern(firstVideo)
         f.write(firstPartVideo + SEPARATING_PATTERN + secondPartVideo + '\n')
 
-        #calculating pattern for subtitles
+        # calculating pattern for subtitles
         subs = os.listdir(pathSubs)
         subs.sort()
         firstSub = subs[0]
         (firstPartSub, secondPartSub) = getPattern(firstSub)
         f.write(firstPartSub + SEPARATING_PATTERN + secondPartSub + '\n')
     return
+
 
 def updateCountFile(count):
     with open("count.txt", "w") as f:
@@ -62,4 +66,4 @@ def readSetting():
         videoPattern = f.readline().strip() # video pattern
         subsPattern = f.readline().strip() # subs pattern
 
-    return (count, pathToVid, pathToSubs, videoPattern, subsPattern)
+    return count, pathToVid, pathToSubs, videoPattern, subsPattern

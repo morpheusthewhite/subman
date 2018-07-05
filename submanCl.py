@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
 from sys import argv
-from settingUtil import *
-import Util
+from bin.settingUtil import *
+from bin import playUtil
 
-#TODO: use argparse
-#TODO: give the user the possibility to play last video
+###---Command line version of subman---###
+
+# TODO: use argparse
+# TODO: give the user the possibility to play last video
 
 if len(argv) > 1 and argv[1] == "-h" :
     print("Script for launching videos with subs in specified folders. Reminds of the last episode watched")
@@ -27,7 +29,7 @@ import subprocess
 (count, pathToVideo, pathToSubs, videoPattern, subsPattern) = readSetting()
 
 print("Calculating next video and next subtitles file")
-(nextVid, nextSub) = Util.getNext(pathToVideo, videoPattern, pathToSubs, subsPattern, count)
+(nextVid, nextSub) = playUtil.getNext(pathToVideo, videoPattern, pathToSubs, subsPattern, count)
 
 if nextVid is None and nextSub is None:
     print("No more files are available, exiting...")
@@ -38,7 +40,7 @@ vlc_args = ["vlc", "--fullscreen", "--sub-file", nextSub, "--play-and-exit", nex
 vlc = subprocess.Popen(vlc_args)
 vlc.wait()
 
-#TODO: manage real end of the video and end of the application
+# TODO: manage real end of the video and end of the application
 
 print("Updating count file...")
 updateCountFile(count)
