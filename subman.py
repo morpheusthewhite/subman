@@ -67,6 +67,10 @@ class gui(Tk):
         self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern)
 
     def play(self):
+        if not bin.settingUtil.existSettingAndCountFile():
+            messagebox.showwarning("Error", "No video specified")
+            return
+
         (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo.videoPath, self.playInfo.videoPattern, self.playInfo.subsPath,
                              self.playInfo.subsPattern, self.playInfo.count)
 
@@ -85,7 +89,16 @@ class gui(Tk):
             response = messagebox.askokcancel(title="Confirm", message="This will replace previous configuration file. Are you sure?")
             if response:
                 bin.settingUtil.createSettingAndCountFile(self.frameVideo.videoPathText.get(), self.frameSubs.subsPathText.get())
+        else:
+            bin.settingUtil.createSettingAndCountFile(self.frameVideo.videoPathText.get(),
+                                                      self.frameSubs.subsPathText.get())
 
+            (count, videoPath, subsPath, videoPattern, subsPattern) = bin.settingUtil.readSetting()
+
+            if not hasattr(self, "playInfo"):
+                self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern)
+            else:
+                self.playInfo.reconfigure(count, videoPath, videoPattern, subsPath, subsPattern)
 
     def reset(self):
         if bin.settingUtil.existSettingAndCountFile():

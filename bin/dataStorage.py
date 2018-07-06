@@ -6,3 +6,10 @@ class DataStorage():
         self.videoPattern = videoPattern
         self.subsPath = subsPath
         self.subsPattern = subsPattern
+
+    def reconfigure(self, count, videoPath, videoPattern, subsPath, subsPattern):
+        self.count = count
+        self.videoPath = videoPath
+        self.videoPattern = videoPattern
+        self.subsPath = subsPath
+        self.subsPattern = subsPattern
