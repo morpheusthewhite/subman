@@ -141,14 +141,15 @@ class gui(Tk):
 
     def chooseSubs(self):
         text = filedialog.askdirectory(title="Select video folder")
-        if not text == "":
+        print("Read:"+ str(text))
+        if not text == ():
             self.frameSubs.subsPathText.delete(0, 'end')  # clear text
             self.frameSubs.subsPathText.insert(END, text)
 
 
     def chooseVid(self):
         text = filedialog.askdirectory(title="Select subs folder")
-        if not text == "":
+        if not text == ():
             self.frameVideo.videoPathText.delete(0, 'end')  # clear text
             self.frameVideo.videoPathText.insert(END, text)
 
