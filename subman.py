@@ -1,13 +1,14 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/python3.6
 
 ###---GUI version of subman---###
 
 from tkinter import *
 from tkinter import filedialog, messagebox
-import os, bin.settingUtil, bin.playUtil, bin.dataStorage
-import subprocess
+import os, bin.settingUtil, bin.playUtil, bin.dataStorage, bin.pathUtil
+import subprocess, inspect
 
-CURRENT_PATH = os.getcwd()
+CURRENT_PATH = bin.pathUtil.calculatePath(os.path.realpath(__file__))
+
 
 class gui(Tk):
     def __init__(self):
@@ -15,7 +16,7 @@ class gui(Tk):
         self.wm_title("subman")
 
         #set the icon
-        self.__imgicon__ = PhotoImage(file=os.path.join(CURRENT_PATH, "media", 'iconWhite.png'))
+        self.__imgicon__ = PhotoImage(file=os.path.join(CURRENT_PATH, "media", "iconWhite.png"))
         self.tk.call('wm', 'iconphoto', self._w, self.__imgicon__)
 
         self.frameVideo = Frame(self, borderwidth=1, relief="groove")
@@ -113,7 +114,7 @@ class gui(Tk):
 
 
     def chooseSubs(self):
-        text = filedialog.askdirectory(title="Select subs folder")
+        text = filedialog.askdirectory(title="Select video folder")
         if not text == "":
             self.frameSubs.subsPathText.delete(0, 'end')  # clear text
             self.frameSubs.subsPathText.insert(END, text)
