@@ -19,40 +19,24 @@ class gui(Tk):
         self.__imgicon__ = PhotoImage(file=os.path.join(CURRENT_PATH, "media", "iconWhite.png"))
         self.tk.call('wm', 'iconphoto', self._w, self.__imgicon__)
 
-        self.frameVideo = Frame(self, borderwidth=1, relief="groove")
-        self.frameVideo.videoLabel = Label(self.frameVideo, text="Video")
-        self.frameVideo.videoLabel.pack(side="left")
-        self.frameVideo.videoPathText = Entry(self.frameVideo, width=30)
-        self.frameVideo.videoPathText.pack(side="left", padx=4, pady=7, fill="x", expand=True)
-        self.frameVideo.videoOpenFolder = Button(self.frameVideo, text="...", height=1, width=1, command=self.chooseVid)
-        self.frameVideo.videoOpenFolder.pack(side="right")
-        self.frameVideo.pack(pady=5, fill="x", expand=True)
+        self.upperFrame = Frame(self)
 
+        self.selectionFrame = Frame(self.upperFrame)
+        self.__initializeVideoFrame__()
         """ WIP
         self.checkbutton = Checkbutton(self, text="Subtitled")
         self.checkbutton.pack(pady=5)
         """
+        self.__initializeSubsFrame__()
+        self.selectionFrame.pack(side="left", fill="x", expand=True)
 
-        self.frameSubs = Frame(self, borderwidth=1, relief="groove")
-        self.frameSubs.subsLabel = Label(self.frameSubs, text="Subs")
-        self.frameSubs.subsLabel.pack(side="left")
-        self.frameSubs.subsPathText = Entry(self.frameSubs, width=30)
-        self.frameSubs.subsPathText.pack(side="left", padx=4, pady=7, fill="x", expand=True)
-        self.frameSubs.subsOpenFolder = Button(self.frameSubs, text="...", height=1, width=1, command=self.chooseSubs)
-        self.frameSubs.subsOpenFolder.pack(side="right")
-        self.frameSubs.pack(pady=5, fill="x", expand=True)
+        self.__initializeCountFrame()
 
-        self.buttonsFrame = Frame(self)
-        self.buttonsFrame.applyButton = Button(self, text="Apply", command=self.apply)
-        self.buttonsFrame.applyButton.pack(side="left")
-        self.buttonsFrame.playButton = Button(self, text="Play", command=self.play)
-        self.__buttonImage__ = PhotoImage(file=os.path.join(CURRENT_PATH, "media", 'playButtonGreen.png'))
-        self.buttonsFrame.playButton.config(image=self.__buttonImage__, height=30, width=30)
-        self.buttonsFrame.playButton.pack(side="left", padx=120, expand=True)
-        self.buttonsFrame.applyButton = Button(self, text="Reset", command=self.reset)
-        self.buttonsFrame.applyButton.pack(side="left")
+        self.upperFrame.pack(fill="x", expand=True)
 
-        self.center_window(400, 160)
+        self.__initializeButtonsFrame__()
+
+        self.center_window(480, 160)
 
         if bin.settingUtil.existSettingAndCountFile():
             # reading saved datas
@@ -62,8 +46,49 @@ class gui(Tk):
             # setting text areas with saved text
             self.frameVideo.videoPathText.insert(END, self.playInfo.videoPath)
             self.frameSubs.subsPathText.insert(END, self.playInfo.subsPath)
+            self.setCounter(count)
 
-    def updateStorage(self, ):
+    def __initializeVideoFrame__(self):
+        self.frameVideo = Frame(self.selectionFrame, borderwidth=1, relief="groove")
+        self.frameVideo.videoLabel = Label(self.frameVideo, text="Video")
+        self.frameVideo.videoLabel.pack(side="left")
+        self.frameVideo.videoPathText = Entry(self.frameVideo, width=30)
+        self.frameVideo.videoPathText.pack(side="left", padx=4, pady=7, fill="x", expand=True)
+        self.frameVideo.videoOpenFolder = Button(self.frameVideo, text="...", height=1, width=1, command=self.chooseVid)
+        self.frameVideo.videoOpenFolder.pack(side="right")
+        self.frameVideo.pack(pady=5, expand=True, fill="x")
+
+    def __initializeSubsFrame__(self):
+        self.frameSubs = Frame(self.selectionFrame, borderwidth=1, relief="groove")
+        self.frameSubs.subsLabel = Label(self.frameSubs, text="Subs")
+        self.frameSubs.subsLabel.pack(side="left")
+        self.frameSubs.subsPathText = Entry(self.frameSubs, width=30)
+        self.frameSubs.subsPathText.pack(side="left", padx=4, pady=7, fill="x", expand=True)
+        self.frameSubs.subsOpenFolder = Button(self.frameSubs, text="...", height=1, width=1, command=self.chooseSubs)
+        self.frameSubs.subsOpenFolder.pack(side="right")
+        self.frameSubs.pack(pady=5, expand=True, fill="x")
+
+    def __initializeButtonsFrame__(self):
+        self.buttonsFrame = Frame(self)
+        self.buttonsFrame.applyButton = Button(self, text="Apply", command=self.apply)
+        self.buttonsFrame.applyButton.pack(side="left")
+        self.buttonsFrame.playButton = Button(self, text="Play", command=self.play)
+        self.__buttonImage__ = PhotoImage(file=os.path.join(CURRENT_PATH, "media", 'playButtonGreen.png'))
+        self.buttonsFrame.playButton.config(image=self.__buttonImage__, height=30, width=30)
+        self.buttonsFrame.playButton.pack(side="left", padx=120, expand=True)
+        self.buttonsFrame.applyButton = Button(self, text="Reset", command=self.reset)
+        self.buttonsFrame.applyButton.pack(side="left")
+        self.buttonsFrame.pack()
+
+    def __initializeCountFrame(self):
+        self.countFrame = Frame(self.upperFrame, borderwidth=1, relief="groove", width=6)
+        self.countFrame.countLabel = Label(self.countFrame, text="Count")
+        self.countFrame.countLabel.pack()
+        self.countFrame.counter = Spinbox(self.countFrame, width=6, from_=1, increment=1, to=10)
+        self.countFrame.counter.pack(pady=10)
+        self.countFrame.pack(side="right", ipady=10, padx=5)
+
+    def updateStorage(self):
         (count, videoPath, subsPath, videoPattern, subsPattern) = bin.settingUtil.readSetting()
         self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern)
 
@@ -72,18 +97,21 @@ class gui(Tk):
             messagebox.showwarning("Error", "No video specified")
             return
 
+        episodeNumber = int(self.countFrame.counter.get())
+
         (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo.videoPath, self.playInfo.videoPattern, self.playInfo.subsPath,
-                             self.playInfo.subsPattern, self.playInfo.count)
+                             self.playInfo.subsPattern, episodeNumber)
 
         if nextVideo is None and nextSub is None:
-            messagebox.showwarning("Error", "No more video are available in the specified directory")
+            messagebox.showwarning("Error", "Video not available in the specified directory")
 
         vlc_args = ["vlc", "--fullscreen", "--sub-file", nextSub, "--play-and-exit", nextVideo]
         vlc = subprocess.Popen(vlc_args)
         vlc.wait()
 
-        bin.settingUtil.updateCountFile(self.playInfo.count)
-        self.playInfo.count += 1
+        bin.settingUtil.updateCountFile(episodeNumber+1)
+        self.playInfo.count = episodeNumber+1
+        self.setCounter(self.playInfo.count)
 
     def apply(self):
         if bin.settingUtil.existSettingAndCountFile():
@@ -111,8 +139,6 @@ class gui(Tk):
                 os.remove(os.getcwd()+"/count.txt")
                 os.remove(os.getcwd()+"/settings.ini")
 
-
-
     def chooseSubs(self):
         text = filedialog.askdirectory(title="Select video folder")
         if not text == "":
@@ -136,6 +162,9 @@ class gui(Tk):
         y = (screen_height / 2) - (height / 2)
         self.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
+    def setCounter(self, n):
+        self.countFrame.counter.delete(0, END)
+        self.countFrame.counter.insert(END, n)
 
 mainWindow = gui()
 mainWindow.mainloop()
