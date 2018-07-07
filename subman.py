@@ -39,14 +39,7 @@ class gui(Tk):
         self.center_window(480, 160)
 
         if bin.settingUtil.existSettingAndCountFile():
-            # reading saved datas
-            (count, videoPath, subsPath, videoPattern, subsPattern) = bin.settingUtil.readSetting()
-            self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern)
-
-            # setting text areas with saved text
-            self.frameVideo.videoPathText.insert(END, self.playInfo.videoPath)
-            self.frameSubs.subsPathText.insert(END, self.playInfo.subsPath)
-            self.setCounter(count)
+            self.recoverData()
 
     def __initializeVideoFrame__(self):
         self.frameVideo = Frame(self.selectionFrame, borderwidth=1, relief="groove")
@@ -88,9 +81,16 @@ class gui(Tk):
         self.countFrame.counter.pack(pady=10)
         self.countFrame.pack(side="right", ipady=10, padx=5)
 
-    def updateStorage(self):
+
+    def recoverData(self):
+        # reading saved datas
         (count, videoPath, subsPath, videoPattern, subsPattern) = bin.settingUtil.readSetting()
         self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern)
+
+        # setting text areas with saved text
+        self.frameVideo.videoPathText.insert(END, self.playInfo.videoPath)
+        self.frameSubs.subsPathText.insert(END, self.playInfo.subsPath)
+        self.setCounter(self.playInfo.count)
 
     def play(self):
         if not bin.settingUtil.existSettingAndCountFile():
@@ -99,8 +99,7 @@ class gui(Tk):
 
         episodeNumber = int(self.countFrame.counter.get())
 
-        (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo.videoPath, self.playInfo.videoPattern, self.playInfo.subsPath,
-                             self.playInfo.subsPattern, episodeNumber)
+        (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo, episodeNumber)
 
         if nextVideo is None and nextSub is None:
             messagebox.showwarning("Error", "Video not available in the specified directory")
@@ -109,7 +108,7 @@ class gui(Tk):
         vlc = subprocess.Popen(vlc_args)
         vlc.wait()
 
-        bin.settingUtil.updateCountFile(episodeNumber+1)
+        bin.settingUtil.updateCountFile(episodeNumber)
         self.playInfo.count = episodeNumber+1
         self.setCounter(self.playInfo.count)
 
@@ -141,7 +140,6 @@ class gui(Tk):
 
     def chooseSubs(self):
         text = filedialog.askdirectory(title="Select video folder")
-        print("Read:"+ str(text))
         if not text == ():
             self.frameSubs.subsPathText.delete(0, 'end')  # clear text
             self.frameSubs.subsPathText.insert(END, text)
