@@ -41,6 +41,8 @@ def createSettingAndCountFile(pathVideos, pathSubs):
         f.write(firstPartVideo + SEPARATING_PATTERN + secondPartVideo + '\n')
 
         # calculating pattern for subtitles
+        if pathSubs=="":
+            return;
         subs = os.listdir(pathSubs)
         subs.sort()
         firstSub = subs[0]

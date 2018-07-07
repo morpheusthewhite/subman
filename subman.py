@@ -19,16 +19,15 @@ class gui(Tk):
         self.__imgicon__ = PhotoImage(file=os.path.join(CURRENT_PATH, "media", "iconWhite.png"))
         self.tk.call('wm', 'iconphoto', self._w, self.__imgicon__)
 
+        # upperFrame incapsulates everything except the buttons
         self.upperFrame = Frame(self)
 
         self.selectionFrame = Frame(self.upperFrame)
+        # all children of selectionFrame
         self.__initializeVideoFrame__()
-        """ WIP
-        self.checkbutton = Checkbutton(self, text="Subtitled")
-        self.checkbutton.pack(pady=5)
-        """
+        self.__initializeCheckFrame()
         self.__initializeSubsFrame__()
-        self.selectionFrame.pack(side="left", fill="x", expand=True)
+        self.selectionFrame.pack(side="left", fill="x", expand=True, padx=5)
 
         self.__initializeCountFrame()
 
@@ -76,11 +75,24 @@ class gui(Tk):
     def __initializeCountFrame(self):
         self.countFrame = Frame(self.upperFrame, borderwidth=1, relief="groove", width=6)
         self.countFrame.countLabel = Label(self.countFrame, text="Count")
-        self.countFrame.countLabel.pack()
+        self.countFrame.countLabel.pack(pady=5)
         self.countFrame.counter = Spinbox(self.countFrame, width=6, from_=1, increment=1, to=10)
-        self.countFrame.counter.pack(pady=10)
-        self.countFrame.pack(side="right", ipady=10, padx=5)
+        self.countFrame.counter.pack(pady=20)
+        self.countFrame.pack(side="right", ipady=11, padx=5)
 
+    def __initializeCheckFrame(self):
+        self.checkFrame = Frame(self.selectionFrame)
+        self.withSubs = IntVar()
+        self.withSubs.set(1)
+        self.checkFrame.checkbuttonSubs = Checkbutton(self.checkFrame, text="Subtitled", command=self.checkSubsPressed,
+                                                      selectcolor="black", variable=self.withSubs) # change here selectcolor if it does not look good
+        self.checkFrame.checkbuttonSubs.pack(side=LEFT)
+        self.inFullscreen = IntVar()
+        self.inFullscreen.set(1)
+        self.checkFrame.checkbuttonFullscreen = Checkbutton(self.checkFrame, text="Fullscreen", variable=self.inFullscreen,
+                                                            selectcolor="black") # change here selectcolor if it does not look good
+        self.checkFrame.checkbuttonFullscreen.pack(side=LEFT)
+        self.checkFrame.pack(pady=5)
 
     def recoverData(self):
         # reading saved datas
@@ -99,12 +111,23 @@ class gui(Tk):
 
         episodeNumber = int(self.countFrame.counter.get())
 
-        (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo, episodeNumber)
+        if self.withSubs.get() == 1:
+            (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo, episodeNumber)
+        else:
+            (nextVideo, nextSub) = bin.playUtil.getNextNoSubs(self.playInfo, episodeNumber)
 
         if nextVideo is None and nextSub is None:
             messagebox.showwarning("Error", "Video not available in the specified directory")
 
-        vlc_args = ["vlc", "--fullscreen", "--sub-file", nextSub, "--play-and-exit", nextVideo]
+        vlc_args = ["vlc", "--play-and-exit", nextVideo]
+
+        if self.withSubs.get() == 1:
+            vlc_args.append("--sub-file")
+            vlc_args.append(nextSub)
+
+        if self.inFullscreen.get() == 1:
+            vlc_args.append("--fullscreen")
+
         vlc = subprocess.Popen(vlc_args)
         vlc.wait()
 
@@ -118,6 +141,10 @@ class gui(Tk):
             if response:
                 bin.settingUtil.createSettingAndCountFile(self.frameVideo.videoPathText.get(), self.frameSubs.subsPathText.get())
         else:
+            if self.selectionFrame.videoPathText.get() == "" or (self.withSubs.get() == 1 and self.selectionFrame.subsPathText.get() == ""):
+                messagebox.showwarning(title="Error", message="Some path are unspecified")
+                return
+
             bin.settingUtil.createSettingAndCountFile(self.frameVideo.videoPathText.get(),
                                                       self.frameSubs.subsPathText.get())
 
@@ -164,6 +191,15 @@ class gui(Tk):
     def setCounter(self, n):
         self.countFrame.counter.delete(0, END)
         self.countFrame.counter.insert(END, n)
+
+    def checkSubsPressed(self):
+        if self.withSubs.get() == 0:
+            self.frameSubs.subsPathText.configure(state=DISABLED)
+            self.frameSubs.subsOpenFolder.configure(state=DISABLED)
+        else:
+            self.frameSubs.subsPathText.configure(state=NORMAL)
+            self.frameSubs.subsOpenFolder.configure(state=NORMAL)
+
 
 mainWindow = gui()
 mainWindow.mainloop()
