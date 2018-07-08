@@ -1,8 +1,21 @@
 # subman
-A python script for launching video and subs from specified folder and keeping record of watched videos.  
+A python script for launching video and subs (not necessarily) from specified folder and keeping record of watched videos.  
+  
+<h3>Preview</h3> 
+  
+![Alt text](media/Screenshots/screen01?raw=true "Screenshot")
 
-Usage:  
-Videos and subtitles must be in separated folder and each one should contains only videos or subtitles with the same format name (and 2 digit for the episode);  
+
+<h3>Requirements</h3>  
+vlc, python3.6, tkinter (automatically installed by install.sh)  
+  
+  
+<h3>Installation</h3>   
+On linux, launch install.sh (will install dependencies and add the desktop entry).  
+
+<h3>Usage</h3>  
+Videos and subtitles must be in separated folder and each one should contains only videos or subtitles with the same format name (and 2 digit for the episode);    
+  
 For example:  
 ```
 Videos/  
@@ -11,7 +24,7 @@ Videos/
 Subtitles/  
   Sub01  
   Sub02  
-```	  
+```
 Will work.  
 
   
@@ -58,5 +71,3 @@ Season1/
   Sub02  
  ``` 
 Will not work.  
-
-This is just a beta, so don't blame me if it sucks: I agree with you.
