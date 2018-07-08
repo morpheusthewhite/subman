@@ -29,7 +29,7 @@ class gui(Tk):
         self.__initializeSubsFrame__()
         self.selectionFrame.pack(side="left", fill="x", expand=True, padx=5)
 
-        self.__initializeCountFrame()
+        #self.__initializeCountFrame()
 
         self.upperFrame.pack(fill="x", expand=True)
 
@@ -73,12 +73,12 @@ class gui(Tk):
         self.buttonsFrame.pack()
 
     def __initializeCountFrame(self):
-        self.countFrame = Frame(self.upperFrame, borderwidth=1, relief="groove", width=6)
-        self.countFrame.countLabel = Label(self.countFrame, text="Count")
-        self.countFrame.countLabel.pack(pady=5)
-        self.countFrame.counter = Spinbox(self.countFrame, width=6, from_=1, increment=1, to=10)
-        self.countFrame.counter.pack(pady=20)
-        self.countFrame.pack(side="right", ipady=11, padx=5)
+        self.checkFrame = Frame(self.upperFrame, borderwidth=1, relief="groove", width=6)
+        self.checkFrame.countLabel = Label(self.checkFrame, text="Count")
+        self.checkFrame.countLabel.pack(pady=5)
+        self.checkFrame.counter = Spinbox(self.checkFrame, width=6, from_=1, increment=1, to=10)
+        self.checkFrame.counter.pack(pady=20)
+        self.checkFrame.pack(side="right", ipady=11, padx=5)
 
     def __initializeCheckFrame(self):
         self.checkFrame = Frame(self.selectionFrame)
@@ -86,12 +86,18 @@ class gui(Tk):
         self.withSubs.set(1)
         self.checkFrame.checkbuttonSubs = Checkbutton(self.checkFrame, text="Subtitled", command=self.checkSubsPressed,
                                                       selectcolor="black", variable=self.withSubs) # change here selectcolor if it does not look good
-        self.checkFrame.checkbuttonSubs.pack(side=LEFT)
+        self.checkFrame.checkbuttonSubs.pack(side=LEFT, padx=30)
+
+        self.checkFrame.countLabel = Label(self.checkFrame, text="Count")
+        self.checkFrame.countLabel.pack(side=LEFT)
+        self.checkFrame.counter = Spinbox(self.checkFrame, width=6, from_=1, increment=1, to=10)
+        self.checkFrame.counter.pack(side=LEFT)
+
         self.inFullscreen = IntVar()
         self.inFullscreen.set(1)
         self.checkFrame.checkbuttonFullscreen = Checkbutton(self.checkFrame, text="Fullscreen", variable=self.inFullscreen,
                                                             selectcolor="black") # change here selectcolor if it does not look good
-        self.checkFrame.checkbuttonFullscreen.pack(side=LEFT)
+        self.checkFrame.checkbuttonFullscreen.pack(side=LEFT, padx=30)
         self.checkFrame.pack(pady=5)
 
     def recoverData(self):
@@ -109,7 +115,7 @@ class gui(Tk):
             messagebox.showwarning("Error", "No video specified")
             return
 
-        episodeNumber = int(self.countFrame.counter.get())
+        episodeNumber = int(self.checkFrame.counter.get())
 
         if self.withSubs.get() == 1:
             (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo, episodeNumber)
@@ -189,8 +195,8 @@ class gui(Tk):
         self.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
     def setCounter(self, n):
-        self.countFrame.counter.delete(0, END)
-        self.countFrame.counter.insert(END, n)
+        self.checkFrame.counter.delete(0, END)
+        self.checkFrame.counter.insert(END, n)
 
     def checkSubsPressed(self):
         if self.withSubs.get() == 0:
