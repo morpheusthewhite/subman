@@ -64,8 +64,8 @@ def readSetting():
 
     with open("settings.ini", "r") as f:
         pathToVid = f.readline().strip()  # videos folder
-        pathToSubs = f.readline().strip() # subs folder
-        videoPattern = f.readline().strip() # video pattern
-        subsPattern = f.readline().strip() # subs pattern
+        pathToSubs = f.readline().strip()  # subs folder
+        videoPattern = f.readline().strip()  # video pattern
+        subsPattern = f.readline().strip()  # subs pattern
 
     return count, pathToVid, pathToSubs, videoPattern, subsPattern

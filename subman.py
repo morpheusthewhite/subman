@@ -5,7 +5,7 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
 import os, bin.settingUtil, bin.playUtil, bin.dataStorage, bin.pathUtil
-import subprocess, inspect
+import subprocess
 
 CURRENT_PATH = bin.pathUtil.calculatePath(os.path.realpath(__file__))
 
@@ -15,7 +15,7 @@ class gui(Tk):
         super(gui, self).__init__()
         self.wm_title("subman")
 
-        #set the icon
+        # sets the icon
         self.__imgicon__ = PhotoImage(file=os.path.join(CURRENT_PATH, "media", "iconWhite.png"))
         self.tk.call('wm', 'iconphoto', self._w, self.__imgicon__)
 
@@ -25,11 +25,9 @@ class gui(Tk):
         self.selectionFrame = Frame(self.upperFrame)
         # all children of selectionFrame
         self.__initializeVideoFrame__()
-        self.__initializeCheckFrame()
+        self.__initializeCheckFrame__()
         self.__initializeSubsFrame__()
         self.selectionFrame.pack(side="left", fill="x", expand=True, padx=5)
-
-        #self.__initializeCountFrame()
 
         self.upperFrame.pack(fill="x", expand=True)
 
@@ -54,7 +52,7 @@ class gui(Tk):
         self.frameSubs = Frame(self.selectionFrame, borderwidth=1, relief="groove")
         self.frameSubs.subsLabel = Label(self.frameSubs, text="Subs")
         self.frameSubs.subsLabel.pack(side="left")
-        self.frameSubs.subsPathText = Entry(self.frameSubs, width=30)
+        self.frameSubs.subsPathText = Entry(self.frameSubs, width=30, disabledbackground="dimgrey")
         self.frameSubs.subsPathText.pack(side="left", padx=4, pady=7, fill="x", expand=True)
         self.frameSubs.subsOpenFolder = Button(self.frameSubs, text="...", height=1, width=1, command=self.chooseSubs)
         self.frameSubs.subsOpenFolder.pack(side="right")
@@ -72,20 +70,12 @@ class gui(Tk):
         self.buttonsFrame.applyButton.pack(side="left")
         self.buttonsFrame.pack()
 
-    def __initializeCountFrame(self):
-        self.checkFrame = Frame(self.upperFrame, borderwidth=1, relief="groove", width=6)
-        self.checkFrame.countLabel = Label(self.checkFrame, text="Count")
-        self.checkFrame.countLabel.pack(pady=5)
-        self.checkFrame.counter = Spinbox(self.checkFrame, width=6, from_=1, increment=1, to=10)
-        self.checkFrame.counter.pack(pady=20)
-        self.checkFrame.pack(side="right", ipady=11, padx=5)
-
-    def __initializeCheckFrame(self):
+    def __initializeCheckFrame__(self):
         self.checkFrame = Frame(self.selectionFrame)
         self.withSubs = IntVar()
         self.withSubs.set(1)
         self.checkFrame.checkbuttonSubs = Checkbutton(self.checkFrame, text="Subtitled", command=self.checkSubsPressed,
-                                                      selectcolor="black", variable=self.withSubs) # change here selectcolor if it does not look good
+                                                      selectcolor="black", variable=self.withSubs) # change here selectcolor if it does not look good (especially in light themes)
         self.checkFrame.checkbuttonSubs.pack(side=LEFT, padx=30)
 
         self.checkFrame.countLabel = Label(self.checkFrame, text="Count")
@@ -96,7 +86,7 @@ class gui(Tk):
         self.inFullscreen = IntVar()
         self.inFullscreen.set(1)
         self.checkFrame.checkbuttonFullscreen = Checkbutton(self.checkFrame, text="Fullscreen", variable=self.inFullscreen,
-                                                            selectcolor="black") # change here selectcolor if it does not look good
+                                                            selectcolor="black") # change here selectcolor if it does not look good (especially in light themes)
         self.checkFrame.checkbuttonFullscreen.pack(side=LEFT, padx=30)
         self.checkFrame.pack(pady=5)
 
@@ -166,30 +156,29 @@ class gui(Tk):
             response = messagebox.askokcancel(title="Confirm",
                                               message="This will remove previous configuration file. Are you sure?")
             if response:
-                self.frameSubs.subsPathText.delete(0, 'end')  # clear text
-                self.frameVideo.videoPathText.delete(0, 'end')  # clear text
+                self.frameSubs.subsPathText.delete(0, 'end')  # clears text
+                self.frameVideo.videoPathText.delete(0, 'end')  # clears text
                 os.remove(os.getcwd()+"/count.txt")
                 os.remove(os.getcwd()+"/settings.ini")
 
     def chooseSubs(self):
         text = filedialog.askdirectory(title="Select video folder")
         if not text == ():
-            self.frameSubs.subsPathText.delete(0, 'end')  # clear text
+            self.frameSubs.subsPathText.delete(0, 'end')  # clears text
             self.frameSubs.subsPathText.insert(END, text)
-
 
     def chooseVid(self):
         text = filedialog.askdirectory(title="Select subs folder")
         if not text == ():
-            self.frameVideo.videoPathText.delete(0, 'end')  # clear text
+            self.frameVideo.videoPathText.delete(0, 'end')  # clears text
             self.frameVideo.videoPathText.insert(END, text)
 
     def center_window(self, width=300, height=200):
-        # get screen width and height
+        # gets screen width and height
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
-        # calculate position x and y coordinates
+        # calculates position x and y coordinates
         x = (screen_width / 2) - (width / 2)
         y = (screen_height / 2) - (height / 2)
         self.geometry('%dx%d+%d+%d' % (width, height, x, y))

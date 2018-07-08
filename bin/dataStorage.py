@@ -1,4 +1,5 @@
 class DataStorage():
+    # class used to store play informations in gui
     def __init__(self, count, videoPath, videoPattern, subsPath, subsPattern):
         super().__init__()
         self.count = count
