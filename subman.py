@@ -175,13 +175,13 @@ class gui(Tk):
         self.checkFrame.counter.configure(to=1)
 
     def chooseSubs(self):
-        text = filedialog.askdirectory(title="Select subs folder")
+        text = filedialog.askdirectory(title="Select subs folder", initialdir="~/Videos")
         if not text == ():
             self.frameSubs.subsPathText.delete(0, 'end')  # clears text
             self.frameSubs.subsPathText.insert(END, text)
 
     def chooseVid(self):
-        text = filedialog.askdirectory(title="Select video folder")
+        text = filedialog.askdirectory(title="Select video folder", initialdir="~/Videos")
         if not text == ():
             self.frameVideo.videoPathText.delete(0, 'end')  # clears text
             self.frameVideo.videoPathText.insert(END, text)
