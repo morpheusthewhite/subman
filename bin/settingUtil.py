@@ -1,3 +1,6 @@
+from bin.patternRecognition import getPattern, SEPARATING_PATTERN
+
+
 def existSettingAndCountFile():
     import os
     files = os.listdir(".")
@@ -13,18 +16,7 @@ def existSettingAndCountFile():
     return False
 
 
-# returns 2 strings, the first and the second part of the name (without the episode number)
-def getPattern(filename):
-    for i in range(len(filename)-1, 0, -1):
-        match = filename[i-1]+filename[i]
-        if match == "01":
-           return filename[:i-1], filename[i+1:]
-
-
-SEPARATING_PATTERN = "____"
-
-
-def createSettingAndCountFile(pathVideos, pathSubs):
+def createSettingAndCountFile(pathVideos, pathSubs, withSubs, inFullscreen):
     with open("count.txt", "w") as f:
         f.write("1") # position
 
@@ -33,21 +25,32 @@ def createSettingAndCountFile(pathVideos, pathSubs):
         f.write(pathSubs+'\n') # subs folder
 
         # calculating pattern for videos
-        import os
-        videos = os.listdir(pathVideos)
-        videos.sort()
-        firstVideo = videos[0]
-        (firstPartVideo, secondPartVideo) = getPattern(firstVideo)
+
+        ret = getPattern(pathVideos, True)
+
+        if ret is None:
+            return -1 # TODO : throw an exception
+
+        (firstPartVideo, secondPartVideo, nAvailable) = ret
         f.write(firstPartVideo + SEPARATING_PATTERN + secondPartVideo + '\n')
 
         # calculating pattern for subtitles
-        if pathSubs=="":
-            return;
-        subs = os.listdir(pathSubs)
-        subs.sort()
-        firstSub = subs[0]
-        (firstPartSub, secondPartSub) = getPattern(firstSub)
-        f.write(firstPartSub + SEPARATING_PATTERN + secondPartSub + '\n')
+        if not pathSubs=="":
+            ret = getPattern(pathSubs, False)
+
+            if ret is None:
+                return -1 # TODO : throw an exception
+
+            (firstPartSub, secondPartSub, subAvailable) = ret
+
+            if subAvailable != nAvailable:
+                return -1 # TODO : throw an exception
+
+            f.write(firstPartSub + SEPARATING_PATTERN + secondPartSub + '\n')
+        else:
+            f.writelines("\n")
+
+        f.writelines([str(withSubs)+'\n', str(inFullscreen)+'\n', str(nAvailable)+'\n'])
     return
 
 
@@ -67,5 +70,8 @@ def readSetting():
         pathToSubs = f.readline().strip()  # subs folder
         videoPattern = f.readline().strip()  # video pattern
         subsPattern = f.readline().strip()  # subs pattern
+        withSubs = f.readline().strip()
+        inFullscreen = f.readline().strip()
+        nAvailable = int(f.readline().strip())
 
-    return count, pathToVid, pathToSubs, videoPattern, subsPattern
+    return count, pathToVid, pathToSubs, videoPattern, subsPattern, withSubs, inFullscreen, nAvailable

@@ -36,7 +36,7 @@ class gui(Tk):
         self.center_window(480, 160)
 
         if bin.settingUtil.existSettingAndCountFile():
-            self.recoverData()
+            self.__recoverData__()
 
     def __initializeVideoFrame__(self):
         self.frameVideo = Frame(self.selectionFrame, borderwidth=1, relief="groove")
@@ -80,7 +80,7 @@ class gui(Tk):
 
         self.checkFrame.countLabel = Label(self.checkFrame, text="Count")
         self.checkFrame.countLabel.pack(side=LEFT)
-        self.checkFrame.counter = Spinbox(self.checkFrame, width=6, from_=1, increment=1, to=10)
+        self.checkFrame.counter = Spinbox(self.checkFrame, width=6, from_=1, increment=1, to=1)
         self.checkFrame.counter.pack(side=LEFT)
 
         self.inFullscreen = IntVar()
@@ -90,15 +90,18 @@ class gui(Tk):
         self.checkFrame.checkbuttonFullscreen.pack(side=LEFT, padx=30)
         self.checkFrame.pack(pady=5)
 
-    def recoverData(self):
+    def __recoverData__(self):
         # reading saved datas
-        (count, videoPath, subsPath, videoPattern, subsPattern) = bin.settingUtil.readSetting()
-        self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern)
+        (count, videoPath, subsPath, videoPattern, subsPattern, withSubs, inFullscreen, nAvailable) = bin.settingUtil.readSetting()
+        self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern, nAvailable)
 
-        # setting text areas with saved text
+        # setting text areas with saved text, checkbox and counter limit
         self.frameVideo.videoPathText.insert(END, self.playInfo.videoPath)
         self.frameSubs.subsPathText.insert(END, self.playInfo.subsPath)
         self.setCounter(self.playInfo.count)
+        self.inFullscreen.set(inFullscreen)
+        self.withSubs.set(withSubs)
+        self.checkFrame.counter.configure(to=nAvailable)
 
     def play(self):
         if not bin.settingUtil.existSettingAndCountFile():
@@ -108,9 +111,9 @@ class gui(Tk):
         episodeNumber = int(self.checkFrame.counter.get())
 
         if self.withSubs.get() == 1:
-            (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo, episodeNumber)
+            (nextVideo, nextSub) = bin.playUtil.getNext(self.playInfo, episodeNumber, self.playInfo.nAvailable)
         else:
-            (nextVideo, nextSub) = bin.playUtil.getNextNoSubs(self.playInfo, episodeNumber)
+            (nextVideo, nextSub) = bin.playUtil.getNextNoSubs(self.playInfo, episodeNumber, self.playInfo.nAvailable)
 
         if nextVideo is None and nextSub is None:
             messagebox.showwarning("Error", "Video not available in the specified directory")
@@ -134,41 +137,51 @@ class gui(Tk):
     def apply(self):
         if bin.settingUtil.existSettingAndCountFile():
             response = messagebox.askokcancel(title="Confirm", message="This will replace previous configuration file. Are you sure?")
-            if response:
-                bin.settingUtil.createSettingAndCountFile(self.frameVideo.videoPathText.get(), self.frameSubs.subsPathText.get())
-        else:
-            if self.selectionFrame.videoPathText.get() == "" or (self.withSubs.get() == 1 and self.selectionFrame.subsPathText.get() == ""):
-                messagebox.showwarning(title="Error", message="Some path are unspecified")
+            if not response:
                 return
 
-            bin.settingUtil.createSettingAndCountFile(self.frameVideo.videoPathText.get(),
-                                                      self.frameSubs.subsPathText.get())
+        if self.frameVideo.videoPathText.get() == "" or (self.withSubs.get() == 1 and self.frameSubs.subsPathText.get() == ""):
+            messagebox.showwarning(title="Error", message="Some path are unspecified")
+            return
 
-            (count, videoPath, subsPath, videoPattern, subsPattern) = bin.settingUtil.readSetting()
+        bin.settingUtil.createSettingAndCountFile(self.frameVideo.videoPathText.get(),
+                                                  self.frameSubs.subsPathText.get(), self.withSubs.get(), self.inFullscreen.get())
 
-            if not hasattr(self, "playInfo"):
-                self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern)
-            else:
-                self.playInfo.reconfigure(count, videoPath, videoPattern, subsPath, subsPattern)
+        (count, videoPath, subsPath, videoPattern, subsPattern, _, _, nAvailable) = bin.settingUtil.readSetting()
+
+        if not hasattr(self, "playInfo"):
+            self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern, nAvailable)
+        else:
+            self.playInfo.reconfigure(count, videoPath, videoPattern, subsPath, subsPattern, nAvailable)
+
+        self.setCounter(self.playInfo.count)
+        self.checkFrame.counter.configure(to=nAvailable)
 
     def reset(self):
         if bin.settingUtil.existSettingAndCountFile():
             response = messagebox.askokcancel(title="Confirm",
                                               message="This will remove previous configuration file. Are you sure?")
             if response:
-                self.frameSubs.subsPathText.delete(0, 'end')  # clears text
-                self.frameVideo.videoPathText.delete(0, 'end')  # clears text
                 os.remove(os.getcwd()+"/count.txt")
                 os.remove(os.getcwd()+"/settings.ini")
+            else:
+                return
+
+        self.frameSubs.subsPathText.delete(0, 'end')  # clears text
+        self.frameVideo.videoPathText.delete(0, 'end')  # clears text
+
+        # reset counter
+        self.setCounter(1)
+        self.checkFrame.counter.configure(to=1)
 
     def chooseSubs(self):
-        text = filedialog.askdirectory(title="Select video folder")
+        text = filedialog.askdirectory(title="Select subs folder")
         if not text == ():
             self.frameSubs.subsPathText.delete(0, 'end')  # clears text
             self.frameSubs.subsPathText.insert(END, text)
 
     def chooseVid(self):
-        text = filedialog.askdirectory(title="Select subs folder")
+        text = filedialog.askdirectory(title="Select video folder")
         if not text == ():
             self.frameVideo.videoPathText.delete(0, 'end')  # clears text
             self.frameVideo.videoPathText.insert(END, text)

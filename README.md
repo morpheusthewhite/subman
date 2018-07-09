@@ -14,16 +14,25 @@ vlc, python3.6, tkinter (automatically installed by install.sh)
 On linux, launch install.sh (will install dependencies and add the desktop entry).  
 
 <h3>Usage</h3>  
-Videos and subtitles must be in separated folder and each one should contains only videos or subtitles with the same format name (and 2 digit for the episode);    
-  
+Videos must have the same format name and extension (also subtitles) and 2 digit for the episode;
+<b>Recognized video extensions</b>: .mkv .avi .mp4 .mpeg .flv .wmv
+<b>Recognized subtitles extension</b>: .srt .vtt .scc
+
 For example:  
 ```
-Videos/  
-  Episode01  
-  Episode02  
-Subtitles/  
+VideosFolder/
+  Episode01
+  Episode02
+SubsCasualName/
   Sub01  
   Sub02  
+```
+```
+RandomName/
+  01EpisodeDVD
+  02EpisodeDVD
+  Sub01WhateverYouWantIJustCareAboutExtension
+  Sub02WhateverYouWantIJustCareAboutExtension
 ```
 Will work.  
 
@@ -33,20 +42,10 @@ Viceversa:
 ```
 Videos/  
   Episode01  
-  Episode03  
-Subtitles/  
+  Episode03
   Sub01  
   Sub02  
   ```
-```
-Videos/  
-  Episode01  
-  Episode02  
-Subtitles/  
-  Sub01  
-  Sub02  
-  Folder1/  
- ``` 
 ```
 Videos/  
   Episode00  
@@ -62,12 +61,5 @@ Videos/
 Subtitles/  
   Sub1  
   Sub2  
-```    
 ```
-Season1/  
-  Episode01  
-  Episode02  
-  Sub01  
-  Sub02  
- ``` 
 Will not work.  
