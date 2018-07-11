@@ -209,5 +209,11 @@ class gui(Tk):
             self.frameSubs.subsOpenFolder.configure(state=NORMAL)
 
 
-mainWindow = gui()
-mainWindow.mainloop()
+def main():
+    mainWindow = gui()
+    mainWindow.mainloop()
+
+
+if __name__ == "__main__":
+    main()
+

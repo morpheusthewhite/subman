@@ -8,7 +8,7 @@ def getNext(playInfo, count, nAvailable):
     if nAvailable < count:
         return (None, None)
 
-    if count < 9:
+    if count <= 9:
         countMod = "0"+str(count)
     else:
         countMod = str(count)

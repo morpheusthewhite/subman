@@ -3,7 +3,7 @@ A python script for launching video and subs (not necessarily) from specified fo
   
 <h3>Preview</h3> 
   
-![Alt text](media/Screenshots/screen01?raw=true "Screenshot")
+![Alt text](media/Screenshots/screen01.png?raw=true "Screenshot")
 
 
 <h3>Requirements</h3>  
