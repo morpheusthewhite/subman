@@ -93,15 +93,17 @@ class gui(Tk):
     def __recoverData__(self):
         # reading saved datas
         (count, videoPath, subsPath, videoPattern, subsPattern, withSubs, inFullscreen, nAvailable) = bin.settingUtil.readSetting()
-        self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern, nAvailable)
+        if nAvailable > 0:
+            self.playInfo = bin.dataStorage.DataStorage(count, videoPath, videoPattern, subsPath, subsPattern, nAvailable)
 
-        # setting text areas with saved text, checkbox and counter limit
-        self.frameVideo.videoPathText.insert(END, self.playInfo.videoPath)
-        self.frameSubs.subsPathText.insert(END, self.playInfo.subsPath)
-        self.setCounter(self.playInfo.count)
-        self.inFullscreen.set(inFullscreen)
-        self.withSubs.set(withSubs)
-        self.checkFrame.counter.configure(to=nAvailable)
+            # setting text areas with saved text, checkbox and counter limit
+            self.frameVideo.videoPathText.insert(END, self.playInfo.videoPath)
+            self.frameSubs.subsPathText.insert(END, self.playInfo.subsPath)
+            self.setCounter(self.playInfo.count)
+            self.inFullscreen.set(inFullscreen)
+            self.withSubs.set(withSubs)
+            self.checkFrame.counter.configure(to=nAvailable)
+
 
     def play(self):
         if not bin.settingUtil.existSettingAndCountFile():

@@ -72,6 +72,10 @@ def readSetting():
         subsPattern = f.readline().strip()  # subs pattern
         withSubs = f.readline().strip()
         inFullscreen = f.readline().strip()
-        nAvailable = int(f.readline().strip())
+        nAvailableStr = f.readline().strip()
+        if nAvailableStr != "":
+            nAvailable = int(nAvailableStr) # avoid ValueError
+        else:
+            nAvailable = 0
 
     return count, pathToVid, pathToSubs, videoPattern, subsPattern, withSubs, inFullscreen, nAvailable
