@@ -9,7 +9,7 @@ if ! [ -z `which dnf 2> /dev/null` ]; # Fedora
     then sudo dnf install vlc python3 python3-tkinter 2> /dev/null
 fi
 if ! [ -z `which pacman 2> /dev/null` ]; # Arch Linux
-    then sudo pacman install vlc python3 python3-tkinter 2> /dev/null
+    then sudo pacman -Sy vlc python3 tk 2> /dev/null
 fi
 
 current_dir=`pwd`
@@ -20,9 +20,9 @@ Type=Application
 Version=1.0
 Name=subman
 Comment=A subtitle manager tool
-Path="$current_dir"
-Exec=python3 "$current_dir"/subman.py
-Icon="$current_dir"/media/iconWhite.png
+Path=$current_dir
+Exec=\"$current_dir/subman.py\"
+Icon=$current_dir/media/iconWhite.png
 Terminal=false
 Categories=Media;" | sudo tee /usr/local/share/applications/subman.desktop > /dev/null
 
